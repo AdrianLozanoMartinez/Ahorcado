@@ -2,9 +2,16 @@
 
 namespace Ahorcado
 {
-    internal class Program
+    class Program
     {
-        static void Main(string[] args)
+        //Enumerado con los estados del juego
+        enum Game { Jugando, Ganado, Perdido }
+
+        //Constantes
+        static readonly string[] ARRAYLIST = new string[] { "HTML", "CSS", "JavaScript", "C Sharp", "PHP" }; //Listado de palabras
+        const int ZERO = 0;
+
+        static void Main()
         {
             string randomList = Data();     //Array aleatorio
 
@@ -44,8 +51,7 @@ namespace Ahorcado
         }
 
 
-        //Listado de palabras
-        static readonly string[] ARRAYLIST = new string[] { "HTML", "CSS", "JavaScript", "C Sharp", "PHP" };
+        
 
         //Listado - Sacar palabra aleatoria
         static string Data()
@@ -86,7 +92,6 @@ namespace Ahorcado
         //Comparar palabra introducida con la aleatoria
         static void Compare(string randomList)
         {
-            const int ZERO = 0;
             int cont = 8;                          //Inicializamos a 8 para que vaya bajando según vaya fallando
             string container = "";
             string match = "";
@@ -168,8 +173,8 @@ namespace Ahorcado
                 }
             }
 
-            string container2 = new string(charArray); //El resultado de charArray cuando operamos lo pasamos a string de nuevo
-                                                       //para poder mostrar
+            string container2 = string.Join(",",charArray); //El resultado de charArray cuando operamos lo pasamos a string de nuevo
+                                                            //para poder mostrar
 
             Uncover(randomList, match, container2, cont, match2);
         }
@@ -200,13 +205,10 @@ namespace Ahorcado
             
         }
 
-        //Enumerado con los estados del juego
-        enum Game { Jugando, Ganado, Perdido }  
-
+        
         //Definir el estado del juego
         static void GameStatus(string randomList, string container2, int cont, string box2, string match2)
         {
-            const int ZERO = 0;
             string bigBox = "";
             string bigBox2 = "";
             String win = "";
