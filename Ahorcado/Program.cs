@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Diagnostics.Metrics;
 
 namespace Ahorcado
 {
     class Program
     {
         //Enumerado con los estados del juego
-        enum Game { Jugando, Ganado, Perdido }
+        enum Game { Playing, Winner, Loser }
 
         //Constantes
         static readonly string[] ARRAYLIST = new string[] { "HTML", "CSS", "JavaScript", "C Sharp", "PHP" }; //Listado de palabras
-        const int ZERO = 0;
+        const int COUNTER = 8;
 
         static void Main()
         {
@@ -19,7 +20,14 @@ namespace Ahorcado
 
             ShowStart(box);                 //Muestra menú inicial
 
-            Compare(randomList);            //Arranca programa comparando
+            try
+            {
+                Compare(randomList);        //Arranca programa comparando
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
 
@@ -30,12 +38,13 @@ namespace Ahorcado
             string input = Console.ReadLine().ToLower();  //Lo ponemos en minúscula para no tener problema cuando haga la igualdad
 
             string exception = "";
+            string saveInput = " ";
 
             try                                           //Probamos si va bien o si da error (catch)
             {                                            
-                if (char.IsLetter(input[0]))              //Miramos si es una letra lo introducido
+                if (char.IsLetter(input[0]) || char.IsDigit(input[0]))      //Miramos si es una letra lo introducido
                 {
-                    return input;                         //Devolvemos lo que introducimos por teclado si es una letra
+                    saveInput = input;                         //Devolvemos lo que introducimos por teclado si es una letra
                 }
                 throw new Exception("No introduzca ni números ni símbolos"); //Si no es una letra nos da un error no controlado
             }                                                                //que nos sale en el IDE y al poner catch nos sale
@@ -45,9 +54,9 @@ namespace Ahorcado
                 exception = e.Message;                    //Coge el mensaje de throw y lo metemos en exception para mostrarlo
 
                 ZoneException(exception);                 //Mandamos para mostrar por pantalla
-
-                return "";
             }
+
+            return saveInput;
         }
 
 
@@ -92,7 +101,7 @@ namespace Ahorcado
         //Comparar palabra introducida con la aleatoria
         static void Compare(string randomList)
         {
-            int cont = 8;                          //Inicializamos a 8 para que vaya bajando según vaya fallando
+            int cont = COUNTER;                          //Inicializamos a 8 para que vaya bajando según vaya fallando
             string container = "";
             string match = "";
             string match2 = "";
@@ -109,8 +118,13 @@ namespace Ahorcado
 
                   cont = cont;                     //Se guarda el mismo contador para que no varíe y se guarde
                 }
-                  
-                
+                else
+                {
+                    cont--;                 //Si introduce la misma que se había introducido aunque sea acertada se resta
+                }
+
+
+
                 //Obtener los carácter que coincidan de la palabra aleatoria
                 foreach (char local in randomList)
                 {
@@ -133,7 +147,7 @@ namespace Ahorcado
                 }
 
                 //Restar contador sino se acierta
-                if (!randomList.Contains(input[0]) ) //Si lo introducido no está en la palabra aleatoria nos resta 1
+                if (!randomList.Contains(input[0]))  // Si lo introducido no está en la palabra aleatoria nos resta 1
                 {
                     cont--;                          // -1 por cada ciclo
                 }
@@ -144,7 +158,7 @@ namespace Ahorcado
 
             } 
          
-            while (match2.Length != match.Length && cont > ZERO);  //Cuando el número de caracteres sean iguales tanto la aleatoria
+            while (match2.Length != match.Length && cont > 0);  //Cuando el número de caracteres sean iguales tanto la aleatoria
                                                                    //como la insertada o el contador sea menor que 0 finaliza el
                                                                    //juego
 
@@ -211,9 +225,9 @@ namespace Ahorcado
         {
             string bigBox = "";
             string bigBox2 = "";
-            String win = "";
-            String lose = "";
-            String gaming = "";
+            string win = "";
+            string lose = "";
+            string gaming = "";
 
 
 
@@ -238,18 +252,19 @@ namespace Ahorcado
             //Comparamos si la palabra aleatoria y la destapada (ambas sin repetir palabras) son iguales
             if (bigBox == bigBox2)                        //Si son iguales
             {
-                Game winGame = Game.Ganado;               //Metemos el valor de Ganado en winGame
-                win = $"¡¡¡Enhorabuena!!! Usted ha {winGame.ToString().ToLower()}. La palabra era: {randomList}";  //Muestra Ganado
+                Game winGame = Game.Winner;               //Metemos el valor de Ganado en winGame
+                win = $"¡¡¡Enhorabuena!!! \"{winGame.ToString().ToLower()}\". La palabra era: {randomList}";  //Muestra Ganado
+                                                 //Pasado a ToString para poner minúscula la palabra del enumerado que empieza en mayúscula 
             }
-            else if (bigBox != bigBox2 && cont <= ZERO)   //Si son diferentes y ha acabado el contador(llegó a 0)
+            else if (bigBox != bigBox2 && cont <= 0)   //Si son diferentes y ha acabado el contador(llegó a 0)
             {
-                Game loseGame = Game.Perdido;             //Metemos el valor de Perdido en loseGame
-                lose = $"¡Lo siento mucho! Usted ha {loseGame.ToString().ToLower()}. La palabra era: {randomList}";  //Muestra Perdido
+                Game loseGame = Game.Loser;             //Metemos el valor de Perdido en loseGame
+                lose = $"¡Lo siento mucho! \"{loseGame.ToString().ToLower()}\". La palabra era: {randomList}";  //Muestra Perdido
             }
-            else if (bigBox != bigBox2 && cont > ZERO)    //Si son diferentes y no ha acabado el contador(mayor de 0)
+            else if (bigBox != bigBox2 && cont > 0)    //Si son diferentes y no ha acabado el contador(mayor de 0)
             {                 
-                Game gamingGame = Game.Jugando;           //Metemos el valor de Jugando en gamingGame
-                gaming = "Usted está " + gamingGame.ToString().ToLower();                                            //Muestra Jugando
+                Game gamingGame = Game.Playing;           //Metemos el valor de Jugando en gamingGame
+                gaming = gamingGame.ToString().ToLower();                                            //Muestra Jugando
             }
 
             ShowNew(box2, cont, container2, win, lose, gaming);
@@ -277,7 +292,7 @@ namespace Ahorcado
             }
             Console.WriteLine(new string('-', 3));                                  //Base ---
 
-            Console.WriteLine($"Usted está { Game.Jugando.ToString().ToLower() }"); //Muestra Está usted Jugando
+            Console.WriteLine($"\"{ Game.Playing.ToString().ToLower() }\""); //Muestra Está usted Jugando
         }
 
 
